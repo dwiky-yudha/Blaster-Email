@@ -23,6 +23,6 @@ class KirimEmailController extends Controller
 
         Mail::to($request->email)->send(new MailSend($details));
 
-        return "Email telah dikirim!";
+        return view('responkirim');
     }
 }

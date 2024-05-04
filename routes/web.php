@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KirimEmailController;
+use App\Http\Controllers\BackHomeController;
 
 
 /*
@@ -21,3 +22,4 @@ Route::get('/', function () {
 
 Route::get('formemail', [KirimEmailController::class, 'index']);
 Route::post('kirim', [KirimEmailController::class, 'kirim']);
+Route::get('index', [BackHomeController::class, 'index']);

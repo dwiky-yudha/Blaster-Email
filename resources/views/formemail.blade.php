@@ -22,7 +22,7 @@
     </div>
   
     <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form class="space-y-6" action="/kirim" method="post" id="form">
+      <form class="space-y-6" action="/kirim" method="post">
         @csrf
         <div>
           <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email Target</label>
@@ -36,6 +36,7 @@
         </div>
       </form>
     </div>
+    
   </div>
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
