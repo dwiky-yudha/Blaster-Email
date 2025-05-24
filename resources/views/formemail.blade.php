@@ -1,45 +1,159 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Blaster Email</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.lordicon.com/lordicon.js"></script>
 </head>
+
 <body class="flex justify-center bg-emerald-100">
 
   <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 w-full md:w-1/3 shadow-xl mt-40 rounded-xl bg-white">
-    <div class="sm:mx-auto sm:w-full sm:max-w-sm flex justify-center flex-col items-center ">
-      <lord-icon
-        src="https://cdn.lordicon.com/uecgmesg.json"
-        colors="primary:#121331,secondary:#059669"
-        trigger="loop"
-        delay="500"
-        class="w-[120px] h-[120px]">
-      </lord-icon>
-      <h2 class="text-center text-2xl font-bold tracking-tight text-gray-900">Blaster Email</h2>
+    <div class="text-center">
+      <h2 class="text-2xl font-bold tracking-tight text-gray-900">Blaster Email</h2>
     </div>
-  
-    <div class="mt-4 sm:mx-auto sm:w-full sm:max-w-sm">
+
+    <div class="mt-4">
       <form class="space-y-6" action="/kirim" method="post">
         @csrf
-        <div>
-          <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email Target</label>
-          <div class="mt-2">
-            <input id="email" name="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 px-1.5 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-emerald-600 sm:text-sm sm:leading-6">
+
+        {{-- Input Email Dinamis --}}
+        <div id="email-inputs">
+          <div class="email-group mb-2">
+            <input name="emails[]" type="email" required placeholder="Masukkan email"
+              class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm">
           </div>
         </div>
-  
-        <div>
-          <button type="submit" class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">Blast Email</button>
+
+        <div class="flex justify-between items-center mb-2">
+          <button id="btnTambah" type="button" onclick="tambahEmail()"
+            class="text-sm text-emerald-600 hover:underline">+ Tambah Email</button>
         </div>
+
+        {{-- Input HTML --}}
+        <div>
+          <label for="isiHtml" class="block text-sm font-medium leading-6 text-gray-900">Isi HTML</label>
+          <textarea name="html_content" id="isiHtml" rows="8"
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm"
+            placeholder="<h1>Halo!</h1>"><!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    h1 { color: #059669; }
+  </style>
+</head>
+<body>
+  <h1>Halo Dunia!</h1>
+  <p>Email ini dikirim dari Laravel.</p>
+</body>
+</html></textarea>
+        </div>
+
+        {{-- Tombol Preview --}}
+        <div class="flex justify-end gap-2 mt-2">
+          <button type="button" onclick="previewHtml()"
+            class="text-sm text-blue-600 underline hover:text-blue-800">🔍 Preview HTML</button>
+        </div>
+
+        {{-- Tombol Kirim --}}
+        <button type="submit"
+          class="w-full bg-emerald-600 text-white px-4 py-2 rounded-md text-sm font-semibold hover:bg-emerald-500">
+          Blast Email
+        </button>
       </form>
     </div>
-    
   </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  
+
+  <script>
+    const maxEmail = 10;
+    let previewWindow = null;
+
+    function tambahEmail() {
+      const container = document.getElementById('email-inputs');
+      const count = container.querySelectorAll('.email-group').length;
+      const btn = document.getElementById('btnTambah');
+
+      if (count >= maxEmail) return;
+
+      const div = document.createElement('div');
+      div.className = 'email-group mb-2';
+      div.innerHTML = `
+        <div class="flex gap-2">
+          <input name="emails[]" type="email" required placeholder="Masukkan email"
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-900 shadow-sm">
+          <button type="button" onclick="hapusEmail(this)" class="text-red-500 text-sm">Hapus</button>
+        </div>
+      `;
+      container.appendChild(div);
+      updateTambahBtn();
+    }
+
+    function hapusEmail(button) {
+      const container = document.getElementById('email-inputs');
+      const groups = container.querySelectorAll('.email-group');
+
+      if (groups.length <= 1) {
+        alert("Minimal harus ada 1 email");
+        return;
+      }
+
+      button.closest('.email-group').remove();
+      updateTambahBtn();
+    }
+
+    function updateTambahBtn() {
+      const count = document.querySelectorAll('#email-inputs .email-group').length;
+      const btn = document.getElementById('btnTambah');
+      btn.style.display = count >= maxEmail ? 'none' : 'inline';
+    }
+
+    function previewHtml() {
+      const isi = document.getElementById('isiHtml').value;
+      if (!previewWindow || previewWindow.closed) {
+        previewWindow = window.open('', '_blank');
+      }
+      previewWindow.document.open();
+      previewWindow.document.write(generatePreviewHtml(isi));
+      previewWindow.document.close();
+    }
+
+    function generatePreviewHtml(content) {
+      return `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              .preview-container {
+                padding: 20px;
+                background: #f9f9f9;
+                border: 1px solid #ddd;
+                font-family: Arial, sans-serif;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="preview-container">
+              ${content}
+            </div>
+          </body>
+        </html>
+      `;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const textarea = document.getElementById('isiHtml');
+      textarea.addEventListener('input', () => {
+        if (previewWindow && !previewWindow.closed) {
+          previewWindow.document.open();
+          previewWindow.document.write(generatePreviewHtml(textarea.value));
+          previewWindow.document.close();
+        }
+      });
+    });
+  </script>
 </body>
+
 </html>
