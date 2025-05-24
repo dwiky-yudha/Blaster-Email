@@ -23,7 +23,7 @@ class KirimEmailController extends Controller
         foreach ($request->emails as $email) {
             Mail::send('mailtemplate', ['konten' => $request->html_content], function ($message) use ($email) {
                 $message->to($email)
-                    ->subject('Pesan HTML Kustom');
+                    ->subject('Test Blasting Email Template Holingky');
             });
         }
 
