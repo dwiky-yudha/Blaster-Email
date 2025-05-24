@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Mail\MailSend;
 use Illuminate\Support\Facades\Mail;
 
 class KirimEmailController extends Controller
@@ -15,14 +14,19 @@ class KirimEmailController extends Controller
 
     public function kirim(Request $request)
     {
-        $details = [
-            'nama' => $request->nama,
-            'website' => $request->website,
-            'komentar' => $request->komentar
-        ];
+        $request->validate([
+            'emails' => 'required|array|min:1|max:10',
+            'emails.*' => 'required|email',
+            'html_content' => 'required|string',
+        ]);
 
-        Mail::to($request->email)->send(new MailSend($details));
+        foreach ($request->emails as $email) {
+            Mail::send('mailtemplate', ['konten' => $request->html_content], function ($message) use ($email) {
+                $message->to($email)
+                    ->subject('Pesan HTML Kustom');
+            });
+        }
 
-        return view('responkirim');
+        return view('responkirim')->with('sukses', 'Email HTML berhasil dikirim!');
     }
 }
